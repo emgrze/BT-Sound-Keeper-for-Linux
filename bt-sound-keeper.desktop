@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=BT Sound Keeper for Linux
+Comment=Keeps Bluetooth speaker connection alive
+Exec=AppRun
+Icon=bluetooth
+Terminal=false
+Categories=Utility;
+StartupNotify=false

@@ -1,0 +1,119 @@
+#!/bin/sh
+# =============================================
+# BT Sound Keeper - AppImage
+# Keeps Bluetooth speaker connection alive
+# =============================================
+APP_NAME="BT Sound Keeper for Linux"
+INTERVAL_MIN=4          # Interval in minutes
+FREQUENCY=15            # Frequency in Hz
+DURATION_SEC=5          # Duration of each pulse
+VOLUME=1                # Volume level (tested by you)
+HERE="$(dirname "$(readlink -f "$0")")"
+LOGFILE="$HOME/.config/bt-sound-keeper.log"
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOGFILE"
+}
+
+# =============================================
+# Real, persistent path to this AppImage.
+# $0 inside AppRun points at the temporary FUSE mount
+# (/tmp/.mount_XXXXXX/AppRun), which disappears once the
+# process exits. $APPIMAGE (set by the AppImage runtime)
+# is the actual .AppImage file on disk and survives across
+# runs - that's what autostart must point to.
+# =============================================
+if [ -n "$APPIMAGE" ]; then
+    REAL_EXEC="$APPIMAGE"
+else
+    REAL_EXEC="$HERE/AppRun"
+fi
+
+# =============================================
+# Autostart prompt - only on first run, self-heals stale entries
+# =============================================
+DESKTOP_FILE="$HOME/.config/autostart/bt-sound-keeper.desktop"
+
+ICON_SRC="$HERE/bluetooth.svg"
+ICON_DEST_DIR="$HOME/.local/share/bt-sound-keeper"
+ICON_DEST="$ICON_DEST_DIR/bluetooth.svg"
+
+write_desktop_file() {
+    mkdir -p "$HOME/.config/autostart"
+
+    # The bundled icon only exists while the AppImage is mounted (it lives
+    # inside the squashfs, same story as the old Exec= mount-path bug).
+    # Copy it once to a persistent location so the autostart entry's Icon=
+    # keeps working after the app closes / on next boot.
+    ICON_LINE="Icon=bluetooth"
+    if [ -f "$ICON_SRC" ]; then
+        mkdir -p "$ICON_DEST_DIR"
+        if cp -f "$ICON_SRC" "$ICON_DEST" 2>>"$LOGFILE"; then
+            ICON_LINE="Icon=$ICON_DEST"
+        else
+            log "WARNING: could not copy icon to $ICON_DEST, falling back to theme icon 'bluetooth'"
+        fi
+    else
+        log "WARNING: bundled icon not found at $ICON_SRC, falling back to theme icon 'bluetooth'"
+    fi
+
+    cat > "$DESKTOP_FILE" << EOF
+[Desktop Entry]
+Type=Application
+Name=$APP_NAME
+Comment=Keeps Bluetooth speaker connection alive
+Exec="$REAL_EXEC"
+$ICON_LINE
+Terminal=false
+Hidden=false
+X-GNOME-Autostart-enabled=true
+X-KDE-Autostart-enabled=true
+StartupNotify=false
+Categories=Utility;
+EOF
+}
+
+current_exec_path() {
+    sed -n 's/^Exec=//p' "$DESKTOP_FILE" | head -n1 | tr -d '"'
+}
+
+if [ -f "$DESKTOP_FILE" ]; then
+    EXISTING_PATH="$(current_exec_path)"
+    if [ ! -f "$EXISTING_PATH" ] || [ "$EXISTING_PATH" != "$REAL_EXEC" ]; then
+        # Stale entry (old temp mount path, or AppImage was moved/renamed) - fix silently.
+        write_desktop_file
+        log "Autostart entry was stale, updated Exec to $REAL_EXEC"
+    fi
+else
+    add_to_autostart() {
+        write_desktop_file
+        log "Added to autostart ($REAL_EXEC)"
+    }
+    if command -v zenity >/dev/null 2>&1; then
+        if zenity --question --title="$APP_NAME" \
+            --text="Do you want to add $APP_NAME to autostart?\n\nThis will keep your LG SP2 connected during work." \
+            --ok-label="Yes" --cancel-label="No"; then
+            add_to_autostart
+            zenity --info --title="$APP_NAME" --text="Added to autostart."
+        fi
+    else
+        echo "=== $APP_NAME ==="
+        echo "Add to autostart? (Y/n)"
+        read -r answer
+        case "$answer" in
+            [Yy]*|"") add_to_autostart; echo "Added." ;;
+            *) echo "Skipped." ;;
+        esac
+    fi
+fi
+
+log "Started (freq=${FREQUENCY}Hz, volume=${VOLUME}, every ${INTERVAL_MIN} min)"
+# =============================================
+# Main loop
+# =============================================
+while true; do
+    "$HERE/usr/bin/ffplay" -f lavfi -i "sine=frequency=$FREQUENCY:duration=$DURATION_SEC" \
+        -volume $VOLUME -nodisp -autoexit -loglevel quiet 2>/dev/null || true
+
+    log "Sent keep-alive pulse"
+    sleep $((INTERVAL_MIN * 60))
+done
