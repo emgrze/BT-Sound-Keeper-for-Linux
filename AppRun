@@ -4,7 +4,7 @@
 # Keeps Bluetooth speaker connection alive
 # =============================================
 APP_NAME="BT Sound Keeper for Linux"
-INTERVAL_MIN=4          # Interval in minutes
+INTERVAL_MIN=1          # Interval in minutes
 FREQUENCY=15            # Frequency in Hz
 DURATION_SEC=5          # Duration of each pulse
 VOLUME=1                # Volume level (tested by you)
@@ -90,7 +90,7 @@ else
     }
     if command -v zenity >/dev/null 2>&1; then
         if zenity --question --title="$APP_NAME" \
-            --text="Do you want to add $APP_NAME to autostart?\n\nThis will keep your LG SP2 connected during work." \
+            --text="Do you want to add $APP_NAME to autostart?\n\nThis will keep your Bluetooth device connected during work." \
             --ok-label="Yes" --cancel-label="No"; then
             add_to_autostart
             zenity --info --title="$APP_NAME" --text="Added to autostart."
