@@ -13,12 +13,12 @@ mkdir -p AppDir/usr/bin AppDir/usr/lib
 echo "Downloading static ffplay..."
 wget -q https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz -O ffmpeg.tar.xz
 tar -xf ffmpeg.tar.xz
-cp ffmpeg-n7.1-latest-linux64-gpl-7.1/bin/ffplay AppDir/usr/bin/ffplay
+cp ffmpeg*/bin/ffplay AppDir/usr/bin/ffplay
 chmod +x AppDir/usr/bin/ffplay
 # Copy libraries
-cp -a ffmpeg-n7.1-latest-linux64-gpl-7.1/lib/* AppDir/usr/lib/ 2>/dev/null || true
+cp -a ffmpeg*/lib/* AppDir/usr/lib/ 2>/dev/null || true
 # Cleanup
-rm -rf ffmpeg-n7.1-latest-linux64-gpl-7.1 ffmpeg.tar.xz
+rm -rf ffmpeg* ffmpeg.tar.xz
 # Copy application files
 cp AppRun AppDir/
 cp bt-sound-keeper.desktop AppDir/
