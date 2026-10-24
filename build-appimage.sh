@@ -11,7 +11,7 @@ rm -rf AppDir
 mkdir -p AppDir/usr/bin AppDir/usr/lib
 # Download static ffplay (newer version)
 echo "Downloading static ffplay..."
-wget -q https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n7.1-latest-linux64-gpl-7.1.tar.xz -O ffmpeg.tar.xz
+wget -q https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz -O ffmpeg.tar.xz
 tar -xf ffmpeg.tar.xz
 cp ffmpeg-n7.1-latest-linux64-gpl-7.1/bin/ffplay AppDir/usr/bin/ffplay
 chmod +x AppDir/usr/bin/ffplay
