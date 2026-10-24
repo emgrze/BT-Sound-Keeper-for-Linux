@@ -28,7 +28,7 @@ wget -q https://raw.githubusercontent.com/google/material-design-icons/abd7f5c0e
 chmod +x AppDir/AppRun
 # Build AppImage with fixed name
 echo "Building AppImage..."
-wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
+wget -q https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
 chmod +x appimagetool
 # --appimage-extract-and-run avoids relying on FUSE being available/mounted
 # on the host (CI runners, some minimal desktop setups). Works fine
