@@ -1,7 +1,7 @@
 # BT Sound Keeper for Linux
 
 Keeps a Bluetooth speaker (or headset) from auto-disconnecting due to
-inactivity, by quietly playing an almost inaudible tone every few minutes.
+inactivity, by quietly playing an ~~almost~~ inaudible tone every minute.
 
 Packaged as a single portable `.AppImage` — no installation, no dependencies
 to set up manually.
@@ -79,7 +79,7 @@ and packages it all into `~/AppImages/BT_Sound_Keeper_for_Linux.AppImage`.
 Adjustable at the top of `AppRun`:
 
 ```sh
-INTERVAL_MIN=4   # how often to play the keep-alive tone (minutes)
+INTERVAL_MIN=1   # how often to play the keep-alive tone (minutes)
 FREQUENCY=15     # tone frequency in Hz (kept low / near-inaudible)
 DURATION_SEC=5   # duration of each pulse (seconds)
 VOLUME=1         # playback volume
